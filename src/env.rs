@@ -170,11 +170,15 @@ mod tests {
         }
     }
 
-    #[test]
-    fn test_env_reading() {
+    fn set_env() {
         // Set an environment variable using std::env
         env::set_var("CONFIG_SPENTRY", "test_value");
+        env::set_var("SP_PARAM", r#"LS1hIGFhIC0tYiBiYg=="#);
+    }
 
+    #[test]
+    fn test_env_reading() {
+        set_env();
         // This will call the provided closure when `_defer` goes out of scope.
         let _defer = Defer::new(|| {
             env::remove_var("CONFIG_SPENTRY");
@@ -194,7 +198,7 @@ mod tests {
 
     #[test]
     fn test_get_sp_param() {
-        env::set_var("SP_PARAM", r#"LS1hIGFhIC0tYiBiYg=="#);
+        set_env();
         // This will call the provided closure when `_defer` goes out of scope.
         let _defer = Defer::new(|| {
             env::remove_var("SP_PARAM");
