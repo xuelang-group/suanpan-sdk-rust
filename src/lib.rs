@@ -89,9 +89,11 @@ pub mod app {
         F: Fn(StreamData) -> SuanpanResult<()>,
     {
         let (redis, worker_runtime) = prepare();
+        let recv_queue_name = get_redis_recv_queue_name();
+        redis.init_queue(&recv_queue_name);
         let redis_multi = std::sync::Arc::new(redis);
 
-        let recv_queue_name = get_redis_recv_queue_name();
+
         log::debug!("recv_queue_name:{}", recv_queue_name);
 
         worker_runtime.block_on(async move {
@@ -118,11 +120,15 @@ pub mod app {
         F: Fn(StreamData) -> Fut + Send,
         Fut: Future<Output = SuanpanResult<()>> + Send,
     {
-        let (redis, worker_runtime) = prepare();
+        let (mut redis, worker_runtime) = prepare();
+        let recv_queue_name = get_redis_recv_queue_name();
+        redis.init_queue(&recv_queue_name);
+        worker_runtime.block_on(redis.async_init(1));
         let redis_multi = std::sync::Arc::new(redis);
 
-        let recv_queue_name = get_redis_recv_queue_name();
+
         log::debug!("recv_queue_name:{}", recv_queue_name);
+
 
         worker_runtime.block_on(async move {
             loop {
