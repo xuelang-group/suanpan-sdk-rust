@@ -35,7 +35,7 @@ pub mod app {
     fn prepare() -> (RedisSubscriber, tokio::runtime::Runtime) {
         let redis = {
             let redis_uri = format!(
-                "{}:{}",
+                "redis://{}:{}",
                 get_sp_param(REDIS_HOST_SPARAM_KEY).expect("redis host not found"),
                 get_sp_param(REDIS_PORT_SPARAM_KEY).expect("redis port not found"),
             );

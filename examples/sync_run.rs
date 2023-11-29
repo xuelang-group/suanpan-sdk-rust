@@ -12,5 +12,6 @@ pub fn handler(stream_data: StreamData) -> SuanpanResult<()> {
 }
 
 fn main() {
+    env_logger::init();
     run(handler);
 }
