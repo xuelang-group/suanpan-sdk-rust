@@ -69,9 +69,9 @@ pub mod app {
 
     fn get_redis_recv_queue_name() -> String {
         let recv_queue_name = {
-            let nodeid = crate::env::get_env().config_sp_node_id.clone();
-            let appid = crate::env::get_env().config_sp_app_id.clone();
-            let userid = crate::env::get_env().config_sp_user_id.clone();
+            let nodeid = crate::env::get_env().sp_node_id.clone();
+            let appid = crate::env::get_env().sp_app_id.clone();
+            let userid = crate::env::get_env().sp_user_id.clone();
             if nodeid == "" || appid == "" || userid == "" {
                 panic!(
                     "invalid parameter from env config, {} {} {}",

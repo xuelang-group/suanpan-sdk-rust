@@ -49,19 +49,19 @@ pub struct Env {
     pub config_sp_osslog_ext: String,
     #[serde(default = "default_k8s_pod_name")]
     pub config_hostname: String,
-    #[serde(default)]
-    pub sp_user_id: String,
-    #[serde(default)]
-    pub sp_app_id: String,
     /* used for suanpan-master-pod */
 
     /* used for suanpan-pod */
     #[serde(default)]
     pub sp_param: String,
-    #[serde(default)]
-    pub sp_node_group: String,
     #[serde(default = "default_sp_node_group")]
+    pub sp_node_group: String,
+    #[serde(default)]
     pub sp_node_id: String,
+    #[serde(default)]
+    pub sp_app_id: String,
+    #[serde(default)]
+    pub sp_user_id: String,
     /* used for suanpan-pod */
     //-----------------dev mode
     #[cfg(feature = "dev_mode")]
