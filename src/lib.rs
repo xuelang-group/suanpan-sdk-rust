@@ -20,6 +20,7 @@ pub mod app {
     static INIT: Once = Once::new();
     static mut E: Option<(Arc<RedisSubscriber>, Arc<tokio::runtime::Runtime>)> = None;
 
+    #[derive(Debug)]
     pub struct StreamData {
         msg_raw: QueueMessageRaw,
     }
@@ -136,7 +137,7 @@ pub mod app {
         });
     }
 
-    pub fn send_to(port: usize, data: String, msg_id: Option<String>) -> SuanpanResult<()> {
+    pub async fn async_send_to(port: usize, data: String, msg_id: Option<String>) -> SuanpanResult<()> {
         let send_queue_name = {
             let appid = crate::env::get_env().sp_app_id.clone();
             let userid = crate::env::get_env().sp_user_id.clone();
@@ -146,7 +147,7 @@ pub mod app {
             crate::common::get_master_queue_name(&userid, &appid)
         };
 
-        let (redis, worker_runtime) = get_prepare();
+        let (redis, _) = get_prepare();
         let mut suanpan_stream_data = SuanpanStreamSendData::new();
         let out_index = format!("out{}", port);
         if msg_id.is_some() {
@@ -154,8 +155,9 @@ pub mod app {
         }
 
         suanpan_stream_data.set_payload(&out_index, data);
+        log::debug!("send data to {send_queue_name}, with out_idx:{out_index}");
 
-        worker_runtime.block_on(redis.send_message_async(&send_queue_name, suanpan_stream_data))
+        redis.send_message_async(&send_queue_name, suanpan_stream_data).await
     }
 
     pub fn async_run<F, Fut>(aysnc_handler: F)

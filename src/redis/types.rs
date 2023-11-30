@@ -75,6 +75,7 @@ impl<'a> SuanpanStreamSendData<'a> {
     }
 }
 
+#[derive(Debug)]
 pub struct QueueMessageRaw {
     pub id: String,
     pub data: QueueMessageData,
@@ -120,6 +121,7 @@ impl Deref for QueueMessageDataGuard {
     }
 }
 
+#[derive(Debug)]
 pub struct QueueMessageData {
     pub data: StreamId,
 }
