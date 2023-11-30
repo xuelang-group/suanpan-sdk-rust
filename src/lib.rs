@@ -167,30 +167,6 @@ pub mod app {
             .await
     }
 
-    pub fn send_to(port: usize, data: String, msg_id: Option<String>) -> SuanpanResult<()> {
-        let send_queue_name = {
-            let appid = crate::env::get_env().sp_app_id.clone();
-            let userid = crate::env::get_env().sp_user_id.clone();
-            if appid == "" || userid == "" {
-                panic!("invalid parameter from env config, {} {} ", appid, userid);
-            }
-            crate::common::get_master_queue_name(&userid, &appid)
-        };
-
-        let mut suanpan_stream_data = SuanpanStreamSendData::new();
-        let out_index = format!("out{}", port);
-        if msg_id.is_some() {
-            suanpan_stream_data.set_payload("request_id", msg_id.unwrap()); //msg to downstream use request_id to "master/approuter"
-        }
-
-        suanpan_stream_data.set_payload("node_id", crate::env::get_env().sp_node_id.clone());
-        suanpan_stream_data.set_payload(&out_index, data);
-        log::debug!("send data to {send_queue_name}, with out_idx:{out_index}");
-
-        let (redis, worker_runtime) = get_prepare();
-        worker_runtime.block_on(redis.send_message_async(&send_queue_name, suanpan_stream_data))
-    }
-
     pub fn async_run<F, Fut>(aysnc_handler: F)
     where
         F: Fn(StreamData) -> Fut + Send,
