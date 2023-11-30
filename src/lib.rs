@@ -137,7 +137,11 @@ pub mod app {
         });
     }
 
-    pub async fn async_send_to(port: usize, data: String, msg_id: Option<String>) -> SuanpanResult<()> {
+    pub async fn async_send_to(
+        port: usize,
+        data: String,
+        msg_id: Option<String>,
+    ) -> SuanpanResult<()> {
         let send_queue_name = {
             let appid = crate::env::get_env().sp_app_id.clone();
             let userid = crate::env::get_env().sp_user_id.clone();
@@ -154,10 +158,13 @@ pub mod app {
             suanpan_stream_data.set_payload("request_id", msg_id.unwrap());
         }
 
+        suanpan_stream_data.set_payload("node_id", crate::env::get_env().sp_node_id.clone());
         suanpan_stream_data.set_payload(&out_index, data);
         log::debug!("send data to {send_queue_name}, with out_idx:{out_index}");
 
-        redis.send_message_async(&send_queue_name, suanpan_stream_data).await
+        redis
+            .send_message_async(&send_queue_name, suanpan_stream_data)
+            .await
     }
 
     pub fn async_run<F, Fut>(aysnc_handler: F)
