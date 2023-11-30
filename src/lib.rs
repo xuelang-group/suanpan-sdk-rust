@@ -37,7 +37,7 @@ pub mod app {
         }
 
         pub fn get_msg_id(&self) -> SuanpanResult<String> {
-            self.msg_raw.data.get_payload("request_id")
+            self.msg_raw.data.get_payload("id") //msg from upstram use id for request_id
         }
     }
 
@@ -155,7 +155,7 @@ pub mod app {
         let mut suanpan_stream_data = SuanpanStreamSendData::new();
         let out_index = format!("out{}", port);
         if msg_id.is_some() {
-            suanpan_stream_data.set_payload("request_id", msg_id.unwrap());
+            suanpan_stream_data.set_payload("request_id", msg_id.unwrap()); //msg to downstream use request_id to "master/approuter"
         }
 
         suanpan_stream_data.set_payload("node_id", crate::env::get_env().sp_node_id.clone());
