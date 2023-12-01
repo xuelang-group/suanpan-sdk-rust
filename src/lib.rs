@@ -172,6 +172,15 @@ pub mod app {
             .await
     }
 
+    pub fn async_init<F, Fut>(init_func: F)
+    where
+        F: Fn() -> Fut + Send,
+        Fut: Future<Output = ()> + Send,
+    {
+        let (_, worker_runtime) = get_prepare();
+        worker_runtime.block_on(init_func());
+    }
+
     pub fn async_run<F, Fut>(aysnc_handler: F)
     where
         F: Fn(StreamData) -> Fut + Send,
@@ -183,6 +192,8 @@ pub mod app {
         let redis_multi = std::sync::Arc::new(redis);
 
         log::debug!("recv_queue_name:{}", recv_queue_name);
+
+        //init
 
         worker_runtime.block_on(async move {
             loop {

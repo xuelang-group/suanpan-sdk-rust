@@ -1,5 +1,5 @@
 use suanpan::{
-    app::{self, async_run, StreamData},
+    app::{self, async_init, async_run, StreamData},
     types::SuanpanResult,
 };
 
@@ -16,7 +16,12 @@ pub async fn handler(stream_data: StreamData) -> SuanpanResult<()> {
     Ok(())
 }
 
+async fn init() {
+    println!("init");
+}
+
 fn main() {
     env_logger::init();
+    async_init(init);
     async_run(handler);
 }
