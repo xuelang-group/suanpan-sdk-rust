@@ -29,6 +29,7 @@ pub mod app {
         pub fn new(raw: QueueMessageRaw) -> StreamData {
             StreamData { msg_raw: raw }
         }
+
         //TODO: add tyep support for stream data input
         //eg: string,csv, etc..
         pub fn get_input_data(&self, input_num: usize) -> SuanpanResult<String> {
@@ -89,6 +90,10 @@ pub mod app {
 
         worker_runtime.block_on(redis.async_init(1));
         (redis, worker_runtime)
+    }
+
+    pub fn get_right_panel_value(key: &str) -> Option<String> {
+        get_sp_param(key)
     }
 
     fn get_redis_recv_queue_name() -> String {
