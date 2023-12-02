@@ -20,7 +20,7 @@ redis-stream = ["redis", "tokio-stream"]
 graph = []
 
 [dependencies]
-tokio = { version = "1.32" }
+tokio = { version = "1.32", features = ["rt-multi-thread"] }
 tokio-stream = { version = "0.1.14", optional = true }
 redis = { version = "0.23.3", features = ["tokio-comp"], optional = true }
 pretty_env_logger = "0.5"
