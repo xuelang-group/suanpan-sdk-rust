@@ -6,9 +6,8 @@ autoexamples = false
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [features]
+default = ["full"]
 full = ["storage", "redis-stream", "graph"]
-dev-mode = []
-queue-msg-drop-notify = []
 storage = [
     "aws-sdk-s3",
     "aws-types",
@@ -18,6 +17,9 @@ storage = [
 ]
 redis-stream = ["redis", "tokio-stream"]
 graph = []
+
+dev-mode = []
+queue-msg-drop-notify = []
 
 [dependencies]
 tokio = { version = "1.32", features = ["rt-multi-thread"] }
