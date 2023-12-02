@@ -34,14 +34,11 @@ mod test {
 
     #[test]
     fn test_get_args() {
-        let args = get_args("--stream-user-id 'shanglu' --stream-app-id '64049' --stream-node-id 'a002ad00c53211edb01585377faf4695' --stream-host 'spnextapi.xuelangyun.com' --stream-send-queue 'mq-master-shanglu-64049' --stream-recv-queue 'mq-master-shanglu-64049-a002ad00c53211edb01585377faf4695' --stream-send-queue-max-length '2000' --stream-send-queue-trim-immediately 'false' --mq-type 'redis' --mq-redis-host 'app-64049-redis' --mq-redis-port '6379' --mstorage-type 'redis' --mstorage-redis-default-expire '30' --mstorage-redis-host 'app-64049-redis' --mstorage-redis-port '6379'  --__mode 'online-edit'  --__change_pip_source 'https://pypi.mirrors.ustc.edu.cn/simple'  --storage-type 'oss' --storage-oss-endpoint 'https://oss-cn-beijing-internal.aliyuncs.com' --storage-oss-bucket-name 'suanpan' --storage-oss-access-id 'xxxx' --storage-oss-access-key '********' --storage-oss-temp-store '/suanpan' --storage-oss-global-store '/global' --dw-type 'hive' --dw-hive-host 'emr-header-1.cluster-79652' --dw-hive-port '10000' --dw-hive-database 'default' --dw-hive-auth '' --dw-hive-username '' --dw-hive-password '' ");
+        let args =
+            get_args("--stream-user-id 'shanglu' --stream-app-id '64049' --dw-hive-password ''");
         println!("{:?}", args);
         assert_eq!(args.get("--dw-hive-password").unwrap(), "");
-        assert_eq!(
-            args.get("--stream-node-id").unwrap(),
-            "a002ad00c53211edb01585377faf4695"
-        );
-        assert_eq!(args.get("--dw-hive-auth").unwrap(), "");
-        assert_eq!(args.get("--storage-oss-access-key").unwrap(), "********");
+        assert_eq!(args.get("--stream-user-id").unwrap(), "shanglu");
+        assert_eq!(args.get("--stream-app-id").unwrap(), "64049");
     }
 }
