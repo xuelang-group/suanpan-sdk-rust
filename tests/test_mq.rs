@@ -1,3 +1,4 @@
+#![cfg(feature = "redis-stream")]
 use std::sync::Arc;
 use suanpan::redis::mq::RedisSubscriber;
 use suanpan::redis::types::SuanpanStreamSendData;

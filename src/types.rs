@@ -7,6 +7,7 @@ pub struct SuanpanError {
     pub message: String,
 }
 
+#[cfg(feature = "storage")]
 impl From<anyhow::Error> for SuanpanError {
     fn from(err: anyhow::Error) -> Self {
         SuanpanError {
@@ -15,6 +16,7 @@ impl From<anyhow::Error> for SuanpanError {
     }
 }
 
+#[cfg(feature = "storage")]
 impl From<aws_sdk_s3::Error> for SuanpanError {
     fn from(err: aws_sdk_s3::Error) -> Self {
         SuanpanError {
@@ -38,6 +40,7 @@ impl From<(&'static str, String)> for SuanpanError {
     }
 }
 
+#[cfg(feature = "redis-stream")]
 impl From<redis::RedisError> for SuanpanError {
     fn from(err: redis::RedisError) -> Self {
         SuanpanError {

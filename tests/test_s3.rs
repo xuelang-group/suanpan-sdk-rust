@@ -1,3 +1,4 @@
+#![cfg(feature = "storage")]
 use suanpan::storage::s3::Client;
 use tokio;
 

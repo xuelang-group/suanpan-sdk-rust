@@ -1,24 +1,30 @@
 pub mod common;
 pub mod env;
+#[cfg(feature = "graph")]
 pub mod graph;
+#[cfg(feature = "redis-stream")]
 pub mod redis;
+#[cfg(feature = "storage")]
 pub mod storage;
 pub mod types;
 pub mod utils;
 
+#[cfg(feature = "redis-stream")]
 pub mod app {
     use crate::env::get_sp_param;
-    use crate::redis::mq::RedisSubscriber;
-    use crate::redis::types::QueueMessageRaw;
-    use crate::redis::types::SuanpanStreamSendData;
+    use crate::redis::{
+        mq::RedisSubscriber,
+        types::{QueueMessageRaw, SuanpanStreamSendData},
+    };
     use crate::types::SuanpanResult;
     use std::future::Future;
     use std::sync::{Arc, Once};
-    const REDIS_HOST_SPARAM_KEY: &'static str = "mq-redis-host";
-    const REDIS_PORT_SPARAM_KEY: &'static str = "mq-redis-port";
-    const SDK_RECV_QUEUE: &'static str = "stream-recv-queue";
     static INIT: Once = Once::new();
     static mut E: Option<(Arc<RedisSubscriber>, Arc<tokio::runtime::Runtime>)> = None;
+
+    pub const REDIS_HOST_SPARAM_KEY: &'static str = "mq-redis-host";
+    pub const REDIS_PORT_SPARAM_KEY: &'static str = "mq-redis-port";
+    pub const SDK_RECV_QUEUE: &'static str = "stream-recv-queue";
 
     #[derive(Debug)]
     pub struct StreamData {

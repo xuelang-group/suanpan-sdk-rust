@@ -97,16 +97,16 @@ impl QueueMessageRaw {
 pub struct QueueMessageDataGuard {
     pub data: QueueMessageData,
 
-    #[cfg(feature = "queue_msg_drop_notify")]
+    #[cfg(feature = "queue-msg-drop-notify")]
     pub notifier: flume::Sender<()>,
 }
 
 impl Drop for QueueMessageDataGuard {
     fn drop(&mut self) {
-        //#[cfg(feature = "queue_msg_drop_notify")]
+        //#[cfg(feature = "queue-msg-drop-notify")]
         //info!("QueueMessageDataGuard drop");
         //TODO: no use flume use crossbeam to get better performance
-        #[cfg(feature = "queue_msg_drop_notify")]
+        #[cfg(feature = "queue-msg-drop-notify")]
         self.notifier
             .send(())
             .expect("flume unbound size is oversize need to increase!!"); //if send failed that's means recv bounded oversize need to increase

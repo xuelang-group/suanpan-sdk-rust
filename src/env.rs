@@ -64,11 +64,11 @@ pub struct Env {
     pub sp_user_id: String,
     /* used for suanpan-pod */
     //-----------------dev mode
-    #[cfg(feature = "dev_mode")]
+    #[cfg(feature = "dev-mode")]
     #[serde(default)]
     pub debug_graphraw: String,
 
-    #[cfg(feature = "dev_mode")]
+    #[cfg(feature = "dev-mode")]
     #[serde(default)]
     pub debug_redis_uri: String,
 }
