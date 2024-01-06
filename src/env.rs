@@ -53,6 +53,8 @@ pub struct Env {
 
     /* used for suanpan-pod */
     #[serde(default)]
+    pub node_config: String,
+    #[serde(default)]
     pub sp_param: String,
     #[serde(default = "default_sp_node_group")]
     pub sp_node_group: String,
@@ -130,6 +132,36 @@ pub fn get_env() -> &'static Env {
     }
 }
 
+fn value_to_string(value: &serde_json::Value) -> Option<String> {
+    match value {
+        serde_json::Value::Number(num) => Some(num.to_string()),
+        serde_json::Value::String(s) => Some(s.clone()),
+        _ => None, // or handle other types as needed
+    }
+}
+
+pub fn get_node_config(key: &str) -> Option<String> {
+    let env = get_env();
+    let v: serde_json::Value = match serde_json::from_str(env.node_config.as_str()) {
+        Ok(val) => val,
+        Err(_) => {
+            return None;
+        }
+    };
+
+    let keys: Vec<&str> = key.split('.').collect();
+    let mut current_val = &v;
+
+    for key in keys {
+        current_val = match current_val.get(key) {
+            Some(val) => val,
+            None => return None,
+        };
+    }
+
+    value_to_string(current_val)
+}
+
 pub fn get_sp_param(key: &str) -> Option<String> {
     let env = get_env();
     //base 64 decode for env.sp_param
@@ -174,6 +206,10 @@ mod tests {
         // Set an environment variable using std::env
         env::set_var("CONFIG_SPENTRY", "test_value");
         env::set_var("SP_PARAM", r#"LS1hIGFhIC0tYiBiYg=="#);
+        env::set_var(
+            "NODE_CONFIG",
+            r#"{"a":{"b":{"c":"value1", "d":2}},"a2":{"b2":{"c2":"value2"}}}"#,
+        )
     }
 
     #[test]
@@ -207,5 +243,20 @@ mod tests {
         assert_eq!(get_sp_param("a").unwrap(), "aa");
         assert_eq!(get_sp_param("b").unwrap(), "bb");
         assert_eq!(get_sp_param("c").is_none(), true);
+    }
+
+    #[test]
+    fn test_get_node_config() {
+        set_env();
+        // This will call the provided closure when `_defer` goes out of scope.
+        let _defer = Defer::new(|| {
+            env::remove_var("NODE_CONFIG");
+        });
+
+        assert_eq!(get_node_config("a.b.c").unwrap(), "value1");
+        assert_eq!(get_node_config("a.b.d").unwrap(), "2");
+        assert_eq!(get_node_config("a.b").is_none(), true);
+        assert_eq!(get_node_config("a5.b").is_none(), true);
+        assert_eq!(get_node_config("a2.b2.c2").unwrap(), "value2");
     }
 }

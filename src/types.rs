@@ -32,6 +32,22 @@ impl From<&'static str> for SuanpanError {
         }
     }
 }
+
+#[cfg(feature = "logkit")]
+impl From<reqwest::Error> for SuanpanError {
+    fn from(err: reqwest::Error) -> Self {
+        SuanpanError {
+            message: err.to_string(),
+        }
+    }
+}
+
+impl From<String> for SuanpanError {
+    fn from(err: String) -> Self {
+        SuanpanError { message: err }
+    }
+}
+
 impl From<(&'static str, String)> for SuanpanError {
     fn from((err, detail): (&'static str, String)) -> Self {
         SuanpanError {

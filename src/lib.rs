@@ -2,6 +2,8 @@ pub mod common;
 pub mod env;
 #[cfg(feature = "graph")]
 pub mod graph;
+#[cfg(feature = "logkit")]
+pub mod logkit;
 #[cfg(feature = "redis-stream")]
 pub mod redis;
 #[cfg(feature = "storage")]
