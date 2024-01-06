@@ -14,11 +14,11 @@ pub static mut LOGKIT_INSTANCE: Option<Arc<LogKitInner>> = None;
 macro_rules! logkit_init {
     ($rt:expr, $handler:expr) => {
         unsafe {
-            let mut inner = crate::logkit::logkit_inner::LogKitInner::new();
+            let mut inner = $crate::logkit::logkit_inner::LogKitInner::new();
             let recv = inner.take_revicer();
-            crate::logkit::LOGKIT_INSTANCE = Some(std::sync::Arc::new(inner));
+            $crate::logkit::LOGKIT_INSTANCE = Some(std::sync::Arc::new(inner));
             $rt.spawn(async move {
-                crate::logkit::logkit_inner::LogKitInner::run_logkit_handler($handler, recv).await;
+                $crate::logkit::logkit_inner::LogKitInner::run_logkit_handler($handler, recv).await;
             });
         }
     };
@@ -56,13 +56,13 @@ macro_rules! logkit_error {
 macro_rules! log_internal {
     ($level:expr, $msg:expr) => {
         unsafe {
-            if let Some(ref instance) = crate::logkit::LOGKIT_INSTANCE {
+            if let Some(ref instance) = $crate::logkit::LOGKIT_INSTANCE {
                 let _ = instance
                     .emit_log(
                         $level,
                         Utc::now(),
                         $msg,
-                        crate::env::get_env().sp_node_id.clone(),
+                        $crate::env::get_env().sp_node_id.clone(),
                     )
                     .map_err(|e| {
                         log::error!("emit log error:{}", e);
