@@ -242,7 +242,6 @@ pub mod app {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use chrono::Utc;
     use logkit::logkit_inner::LogInfo;
     use std::sync::Mutex;
     use tokio::runtime::Runtime;

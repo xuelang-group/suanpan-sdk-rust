@@ -60,7 +60,7 @@ macro_rules! log_internal {
                 let _ = instance
                     .emit_log(
                         $level,
-                        Utc::now(),
+                        chrono::Utc::now(),
                         $msg,
                         $crate::env::get_env().sp_node_id.clone(),
                     )
