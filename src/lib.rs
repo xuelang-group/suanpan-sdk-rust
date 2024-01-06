@@ -50,13 +50,17 @@ pub mod app {
         }
     }
 
+    pub fn get_async_runtime() -> Arc<tokio::runtime::Runtime> {
+        let (_, worker_runtime) = get_prepare();
+        worker_runtime
+    }
+
     fn get_prepare() -> (
         std::sync::Arc<RedisSubscriber>,
         std::sync::Arc<tokio::runtime::Runtime>,
     ) {
         unsafe {
             INIT.call_once(|| {
-                // Assuming prepare() is a function that returns a tuple (RedisSubscriber, Runtime)
                 let (r, w) = prepare();
                 E = Some((Arc::new(r), Arc::new(w)));
             });
