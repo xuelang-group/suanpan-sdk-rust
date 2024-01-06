@@ -14,6 +14,7 @@ pub mod utils;
 #[cfg(feature = "redis-stream")]
 pub mod app {
     use crate::env::get_sp_param;
+    use crate::logkit_init;
     use crate::redis::{
         mq::RedisSubscriber,
         types::{QueueMessageRaw, SuanpanStreamSendData},
@@ -27,6 +28,16 @@ pub mod app {
     pub const REDIS_HOST_SPARAM_KEY: &'static str = "mq-redis-host";
     pub const REDIS_PORT_SPARAM_KEY: &'static str = "mq-redis-port";
     pub const SDK_RECV_QUEUE: &'static str = "stream-recv-queue";
+
+    pub fn init_logkit() -> SuanpanResult<()> {
+        let rt = get_async_runtime();
+        let logkit_post_master = crate::logkit::LogkitPostMaster::new();
+        logkit_init!(rt, |info| {
+            logkit_post_master.log_kit_http_post_handler(info)
+        });
+        log::debug!("logkit init success");
+        Ok(())
+    }
 
     #[derive(Debug)]
     pub struct StreamData {
