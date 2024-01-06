@@ -27,28 +27,28 @@ macro_rules! logkit_init {
 #[macro_export]
 macro_rules! logkit_debug {
     ($msg:expr) => {
-        log_internal!(log::Level::Debug, $msg)
+        $crate::log_internal!(log::Level::Debug, $msg)
     };
 }
 
 #[macro_export]
 macro_rules! logkit_info {
     ($msg:expr) => {
-        log_internal!(log::Level::Info, $msg)
+        $crate::log_internal!(log::Level::Info, $msg)
     };
 }
 
 #[macro_export]
 macro_rules! logkit_warn {
     ($msg:expr) => {
-        log_internal!(log::Level::Warn, $msg)
+        $crate::log_internal!(log::Level::Warn, $msg)
     };
 }
 
 #[macro_export]
 macro_rules! logkit_error {
     ($msg:expr) => {
-        log_internal!(log::Level::Error, $msg)
+        $crate::log_internal!(log::Level::Error, $msg)
     };
 }
 
