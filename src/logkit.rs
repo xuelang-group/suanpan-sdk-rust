@@ -172,7 +172,7 @@ mod tests {
         logkit_warn!("warnbbc".into());
 
         rt.block_on(async {
-            tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+            tokio::time::sleep(std::time::Duration::from_millis(100)).await;
         });
         assert_eq!(ts_res.test_info.lock().unwrap().len(), 3);
         assert_eq!(
