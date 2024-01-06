@@ -16,7 +16,7 @@ use log::Level;
 static mut LOGKIT_INSTANCE: Option<Arc<LogKitInner>> = None;
 
 #[macro_export]
-macro_rules! init_logkit {
+macro_rules! logkit_init {
     ($rt:expr, $handler:expr) => {
         unsafe {
             let mut inner = LogKitInner::new();
@@ -30,28 +30,28 @@ macro_rules! init_logkit {
 }
 
 #[macro_export]
-macro_rules! debug {
+macro_rules! logkit_debug {
     ($msg:expr) => {
         log_internal!(Level::Debug, $msg)
     };
 }
 
 #[macro_export]
-macro_rules! info {
+macro_rules! logkit_info {
     ($msg:expr) => {
         log_internal!(Level::Info, $msg)
     };
 }
 
 #[macro_export]
-macro_rules! warn {
+macro_rules! logkit_warn {
     ($msg:expr) => {
         log_internal!(Level::Warn, $msg)
     };
 }
 
 #[macro_export]
-macro_rules! error {
+macro_rules! logkit_error {
     ($msg:expr) => {
         log_internal!(Level::Error, $msg)
     };
@@ -166,10 +166,10 @@ mod tests {
         let ts = Arc::new(ts);
         let ts_res = ts.clone();
 
-        init_logkit!(rt, |info| ts.test_logkit_handler(info));
-        debug!("test logkit".into());
-        error!("errorb".into());
-        warn!("warnbbc".into());
+        logkit_init!(rt, |info| ts.test_logkit_handler(info));
+        logkit_debug!("test logkit".into());
+        logkit_error!("errorb".into());
+        logkit_warn!("warnbbc".into());
 
         rt.block_on(async {
             tokio::time::sleep(std::time::Duration::from_millis(500)).await;
