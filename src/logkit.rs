@@ -7,23 +7,18 @@ use logkit_inner::{LogInfo, LogKitInner};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
-// used by marco
-#[allow(unused_imports)]
-use log::Level;
 
-//used by marco
-#[allow(dead_code)]
-static mut LOGKIT_INSTANCE: Option<Arc<LogKitInner>> = None;
+pub static mut LOGKIT_INSTANCE: Option<Arc<LogKitInner>> = None;
 
 #[macro_export]
 macro_rules! logkit_init {
     ($rt:expr, $handler:expr) => {
         unsafe {
-            let mut inner = LogKitInner::new();
+            let mut inner = crate::logkit::logkit_inner::LogKitInner::new();
             let recv = inner.take_revicer();
-            LOGKIT_INSTANCE = Some(Arc::new(inner));
+            crate::logkit::LOGKIT_INSTANCE = Some(std::sync::Arc::new(inner));
             $rt.spawn(async move {
-                LogKitInner::run_logkit_handler($handler, recv).await;
+                crate::logkit::logkit_inner::LogKitInner::run_logkit_handler($handler, recv).await;
             });
         }
     };
@@ -32,28 +27,28 @@ macro_rules! logkit_init {
 #[macro_export]
 macro_rules! logkit_debug {
     ($msg:expr) => {
-        log_internal!(Level::Debug, $msg)
+        log_internal!(log::Level::Debug, $msg)
     };
 }
 
 #[macro_export]
 macro_rules! logkit_info {
     ($msg:expr) => {
-        log_internal!(Level::Info, $msg)
+        log_internal!(log::Level::Info, $msg)
     };
 }
 
 #[macro_export]
 macro_rules! logkit_warn {
     ($msg:expr) => {
-        log_internal!(Level::Warn, $msg)
+        log_internal!(log::Level::Warn, $msg)
     };
 }
 
 #[macro_export]
 macro_rules! logkit_error {
     ($msg:expr) => {
-        log_internal!(Level::Error, $msg)
+        log_internal!(log::Level::Error, $msg)
     };
 }
 
@@ -61,9 +56,14 @@ macro_rules! logkit_error {
 macro_rules! log_internal {
     ($level:expr, $msg:expr) => {
         unsafe {
-            if let Some(ref instance) = LOGKIT_INSTANCE {
+            if let Some(ref instance) = crate::logkit::LOGKIT_INSTANCE {
                 let _ = instance
-                    .emit_log($level, Utc::now(), $msg, get_env().sp_node_id.clone())
+                    .emit_log(
+                        $level,
+                        Utc::now(),
+                        $msg,
+                        crate::env::get_env().sp_node_id.clone(),
+                    )
                     .map_err(|e| {
                         log::error!("emit log error:{}", e);
                     });
@@ -129,57 +129,5 @@ impl LogkitPostMaster {
         } else {
             Err(format!("HTTP POST failed, status code: {}", resp.status()).into())
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use chrono::Utc;
-    use std::sync::Mutex;
-    use tokio::runtime::Runtime;
-
-    struct TestStruct {
-        test_info: Mutex<Vec<String>>,
-        test_level: Mutex<Vec<String>>,
-        test_nodeid: Mutex<Vec<String>>,
-    }
-
-    impl TestStruct {
-        async fn test_logkit_handler(&self, info: LogInfo) -> SuanpanResult<()> {
-            self.test_info.lock().unwrap().push(info.title);
-            self.test_level.lock().unwrap().push(info.level);
-            self.test_nodeid.lock().unwrap().push(info.data.node);
-            Ok(())
-        }
-    }
-
-    #[test]
-    fn test_logkit() {
-        let ts = TestStruct {
-            test_info: Mutex::new(vec![]),
-            test_level: Mutex::new(vec![]),
-            test_nodeid: Mutex::new(vec![]),
-        };
-        let rt = Runtime::new().unwrap();
-
-        let ts = Arc::new(ts);
-        let ts_res = ts.clone();
-
-        logkit_init!(rt, |info| ts.test_logkit_handler(info));
-        logkit_debug!("test logkit".into());
-        logkit_error!("errorb".into());
-        logkit_warn!("warnbbc".into());
-
-        rt.block_on(async {
-            tokio::time::sleep(std::time::Duration::from_millis(100)).await;
-        });
-        assert_eq!(ts_res.test_info.lock().unwrap().len(), 3);
-        assert_eq!(
-            ts_res.test_info.lock().unwrap()[0],
-            "test logkit".to_string()
-        );
-        assert_eq!(ts_res.test_info.lock().unwrap()[2], "warnbbc".to_string());
-        assert_eq!(ts_res.test_level.lock().unwrap()[1], "ERROR".to_string());
     }
 }

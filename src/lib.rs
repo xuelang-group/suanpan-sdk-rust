@@ -227,3 +227,57 @@ pub mod app {
         });
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::Utc;
+    use logkit::logkit_inner::LogInfo;
+    use std::sync::Mutex;
+    use tokio::runtime::Runtime;
+    use types::SuanpanResult;
+
+    struct TestStruct {
+        test_info: Mutex<Vec<String>>,
+        test_level: Mutex<Vec<String>>,
+        test_nodeid: Mutex<Vec<String>>,
+    }
+
+    impl TestStruct {
+        async fn test_logkit_handler(&self, info: LogInfo) -> SuanpanResult<()> {
+            self.test_info.lock().unwrap().push(info.title);
+            self.test_level.lock().unwrap().push(info.level);
+            self.test_nodeid.lock().unwrap().push(info.data.node);
+            Ok(())
+        }
+    }
+
+    #[test]
+    fn test_logkit() {
+        let ts = TestStruct {
+            test_info: Mutex::new(vec![]),
+            test_level: Mutex::new(vec![]),
+            test_nodeid: Mutex::new(vec![]),
+        };
+        let rt = Runtime::new().unwrap();
+
+        let ts = std::sync::Arc::new(ts);
+        let ts_res = ts.clone();
+
+        logkit_init!(rt, |info| ts.test_logkit_handler(info));
+        logkit_debug!("test logkit".into());
+        logkit_error!("errorb".into());
+        logkit_warn!("warnbbc".into());
+
+        rt.block_on(async {
+            tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+        });
+        assert_eq!(ts_res.test_info.lock().unwrap().len(), 3);
+        assert_eq!(
+            ts_res.test_info.lock().unwrap()[0],
+            "test logkit".to_string()
+        );
+        assert_eq!(ts_res.test_info.lock().unwrap()[2], "warnbbc".to_string());
+        assert_eq!(ts_res.test_level.lock().unwrap()[1], "ERROR".to_string());
+    }
+}
