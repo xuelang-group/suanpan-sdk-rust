@@ -90,7 +90,7 @@ impl LogkitPostMaster {
         let port = get_node_config("app.predict.port").unwrap();
 
         let url = format!(
-            "http://{}.{}:{}",
+            "http://{}.{}:{}/internal/logkit/append",
             crate::common::get_app_cs_name(&env.sp_app_id),
             crate::common::get_user_namespace(&env.sp_user_id),
             &port
