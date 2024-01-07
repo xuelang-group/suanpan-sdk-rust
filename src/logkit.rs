@@ -87,7 +87,7 @@ struct LogKitPostMasterData {
 impl LogkitPostMaster {
     pub fn new() -> LogkitPostMaster {
         let env = get_env();
-        let port = get_node_config("App.Predict.Port").unwrap();
+        let port = get_node_config("app.predict.port").unwrap();
 
         let url = format!(
             "http://{}.{}:{}",
