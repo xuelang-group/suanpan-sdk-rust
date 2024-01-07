@@ -42,6 +42,7 @@ impl LogKitInner {
         F: Fn(LogInfo) -> Fut,
         Fut: Future<Output = SuanpanResult<()>>,
     {
+        log::info!("start logit handling thread");
         while let Some(log_info) = r.recv().await {
             // Handle the log info, e.g., sending it to a server
             //println!("Received log: {:?}", log_info);

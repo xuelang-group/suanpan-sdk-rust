@@ -123,6 +123,14 @@ impl LogkitPostMaster {
             .json(&log_kit_post_master_data)
             .send()
             .await?; //request status
+                     //remove after debug
+        log::debug!(
+            "logkit post master, status:{}, appid: {}, url:{}, data:{}",
+            resp.status(),
+            appid,
+            url,
+            String::from_utf8_lossy(data)
+        );
 
         if resp.status().is_success() {
             Ok(())
