@@ -145,6 +145,7 @@ pub fn get_node_config(key: &str) -> Option<String> {
     let v: serde_json::Value = match serde_json::from_str(env.node_config.as_str()) {
         Ok(val) => val,
         Err(_) => {
+            log::warn!("no not have node_config in env");
             return None;
         }
     };
@@ -155,7 +156,10 @@ pub fn get_node_config(key: &str) -> Option<String> {
     for key in keys {
         current_val = match current_val.get(key) {
             Some(val) => val,
-            None => return None,
+            None => {
+                log::warn!("there is no key:{} in node_config", key);
+                return None;
+            }
         };
     }
 
