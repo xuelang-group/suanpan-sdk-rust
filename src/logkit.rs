@@ -80,7 +80,7 @@ pub struct LogkitPostMaster {
 /// master http post handler
 #[derive(Serialize, Deserialize)]
 struct LogKitPostMasterData {
-    appid: String,
+    app: String,
     logs: serde_json::Value,
 }
 
@@ -114,7 +114,7 @@ impl LogkitPostMaster {
     ) -> SuanpanResult<()> {
         let client = Client::new();
         let log_kit_post_master_data = LogKitPostMasterData {
-            appid: appid.to_string(),
+            app: appid.to_string(),
             logs: serde_json::from_slice(data)?,
         };
 
@@ -125,11 +125,11 @@ impl LogkitPostMaster {
             .await?; //request status
                      //remove after debug
         log::debug!(
-            "logkit post master, status:{}, appid: {}, url:{}, data:{}",
+            "logkit post master, status:{}, appid: {}, url:{}, data:{:?}",
             resp.status(),
             appid,
             url,
-            String::from_utf8_lossy(data)
+            serde_json::json!(log_kit_post_master_data)
         );
 
         if resp.status().is_success() {
